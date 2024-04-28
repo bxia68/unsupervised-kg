@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.1.1-devel-ubuntu20.04
 RUN apt update
 
 RUN apt install -y g++ \
@@ -23,10 +23,20 @@ WORKDIR /working_dir
 
 ENV TOKENIZERS_PARALLELISM=true
 
-COPY environment.yml .
+COPY chtc_wrapper/environment.yml .
 
 RUN conda env create -f environment.yml
-# Make RUN commands use the new environment:
+
 SHELL ["conda", "run", "-n", "unsupervised_kg", "/bin/bash", "-c"]
 
-# COPY ./ ./
+RUN conda run --no-capture-output -n unsupervised_kg pip install arq httpx
+
+COPY chtc_wrapper/start.sh .
+RUN chmod +x start.sh
+
+COPY *.py ./
+COPY chtc_wrapper/arq_worker.py .
+COPY chtc_wrapper/wrapper_classes/weaviate_wrapper.py .
+
+CMD ["./start.sh"]
+

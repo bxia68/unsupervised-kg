@@ -3,6 +3,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
 from seq2rel import Seq2Rel
 from seq2rel.common import util
+from safetensors.torch import load_model, save_model
 
 class ModelWrapper:
 
@@ -22,6 +23,8 @@ class RebelWrapper:
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
         self.model = AutoModelForSeq2SeqLM.from_pretrained(model_path).to(self.device)
+        # self.model = 
+        # load_model(, "model.safetensors")
         print("Loaded REBEL model with device", self.device)
     
     def extract_relations_from_model_output(self, text):

@@ -11,6 +11,42 @@ import argparse
 import numpy as np
 import pandas as pd
 
+def run_for_paragraph(paragraph, paragraph_id, model):    
+    kg = KG()
+
+    paragraph = paragraph.strip()
+    if len(paragraph) == 0:
+        return None
+
+    line_kg = get_kg_for_line(model, paragraph, paragraph_id)
+    kg.merge_with_kb(line_kg)
+        
+    return kg
+
+def parse_results(kg):
+    # Add in the edges
+    df_rows = []
+    for r in kg.relations:
+        head, tail, r_type = r["head"], r["tail"], r["type"]
+        sources = r["source"]
+        src_articles = list(sources.keys())
+        src_articles = ",".join(src_articles)
+
+        # Add in the edge
+        if r_type in relation_name_mappings:
+            r_type = relation_name_mappings[r_type]
+
+        # Add in the rows to the csv file
+        for article_id in sources:
+            for sentence in sources[article_id]:
+                df_rows.append([head, r_type, tail, article_id, sentence])
+
+    # print("Creating graph with", len(kg.entities), "entities and", len(df_rows), "relationships")
+
+    df = pd.DataFrame(df_rows, columns = ["src", "type", "dst", "article_id", "sentence"])
+
+    return df
+
 def run_for_file(model, file_path):
     combined_kg = KG()
     with open(file_path, 'r') as reader:

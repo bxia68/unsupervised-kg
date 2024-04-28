@@ -1,0 +1,36 @@
+syntax="proto3";
+
+service WorkerServer {
+    rpc StoreFile(FileDataRequest) returns (ErrorResponse) {}
+    rpc SetStratNames(StratNameRequest) returns (ErrorResponse) {}
+    rpc SetQueries(QueryRequest) returns (ErrorResponse) {}
+    rpc GenerateFacts(FactRequest) returns (ErrorResponse) {}
+    rpc Heartbeat(StatusRequest) returns (StatusResponse) {}
+}
+
+message FileDataRequest {
+    string document_text = 1;
+} 
+
+message StratNameRequest {
+    repeated string strat_names = 1;
+}
+
+message QueryRequest {
+    repeated string queries = 1;
+    repeated string categories = 2;
+}
+
+message FactRequest {
+    string strat_name = 1;
+}
+
+message ErrorResponse {
+    string error = 1;
+}
+
+message StatusRequest {}
+
+message StatusResponse {
+    bool status = 1;
+}

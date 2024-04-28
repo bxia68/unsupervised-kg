@@ -79,11 +79,17 @@ def get_kg_for_line(model, line, article_id, span_length=128):
     for relation in all_relations:
         # Add in metadata if it is a relationship we care about
         relationship_type = relation["type"]
-        if relationship_type not in relation_name_mapper:
-            continue
+        
+        # if relationship_type not in relation_name_mapper:
+        if relationship_type not in [value[0] for value in relation_name_mapper.values()]:
+            continue    
 
-        human_name, src_type, dst_type = relation_name_mapper[relationship_type]
-        relation["human_type"] = human_name
+        relationship_key = next(key for key, value in relation_name_mapper.items() if value[0] == relationship_type)
+        
+        # human_name, src_type, dst_type = relation_name_mapper[relationship_type]
+        _, src_type, dst_type = relation_name_mapper[relationship_key]
+        
+        relation["type_key"] = relationship_key
         relation["src_type"] = src_type
         relation["dst_type"] = dst_type
         relation["source"] = {
